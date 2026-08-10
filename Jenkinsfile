@@ -30,6 +30,7 @@ pipeline {
 
                 sh 'java -version'
                 sh 'mvn -version'
+                sh 'git config --global --add safe.directory "$WORKSPACE"'
                 sh 'git log --oneline -5'
             }
         }
