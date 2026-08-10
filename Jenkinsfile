@@ -11,6 +11,7 @@ pipeline {
         MAVEN_OPTS = '-Dmaven.repo.local=/root/.m2/repository'
         MVN_CMD = 'mvn -B -ntp'
         APP_NAME = 'hello-world'
+        APP_VERSION = '1.0-SNAPSHOT'
     }
 
     options {
@@ -48,6 +49,22 @@ pipeline {
             post {
                 always {
                     junit 'target/surefire-reports/*.xml'
+                }
+            }
+        }
+
+        stage('Quality Analysis') {
+            tools { maven 'Maven-3.9' }
+            steps {
+                withSonarQubeEnv('SonarQube-Local') {
+                    sh """
+                        mvn sonar:sonar \
+                          -Dsonar.projectKey=${env.APP_NAME} \
+                          -Dsonar.projectName="TechBuild ${env.APP_NAME}" \
+                          -Dsonar.projectVersion=${env.APP_VERSION} \
+                         -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml \
+                         -B
+                    """
                 }
             }
         }
