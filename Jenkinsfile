@@ -58,7 +58,7 @@ pipeline {
             steps {
                 withSonarQubeEnv('SonarQube') {
                     sh """
-                        mvn sonar:sonar \
+                        mvn org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
                           -Dsonar.projectKey=${env.APP_NAME} \
                           -Dsonar.projectName="TechBuild ${env.APP_NAME}" \
                           -Dsonar.projectVersion=${env.APP_VERSION} \
