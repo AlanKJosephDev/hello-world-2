@@ -34,5 +34,11 @@ pipeline {
                 sh 'git log --oneline -5'
             }
         }
+
+        stage('Build') {
+            steps {
+                sh "${MVN_CMD} clean compile"
+            }
+        }
     }
 }
