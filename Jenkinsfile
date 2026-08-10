@@ -40,5 +40,16 @@ pipeline {
                 sh "${MVN_CMD} clean compile"
             }
         }
+
+        stage('Test') {
+            steps {
+                sh "${MVN_CMD} test"
+            }
+            post {
+                always {
+                    junit 'target/surefire-reports/*.xml'
+                }
+            }
+        }
     }
 }
