@@ -62,11 +62,66 @@ pipeline {
                           -Dsonar.projectKey=${env.APP_NAME} \
                           -Dsonar.projectName="TechBuild ${env.APP_NAME}" \
                           -Dsonar.projectVersion=${env.APP_VERSION} \
-                         -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml \
-                         -B
+                          -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml \
+                          -B
                     """
                 }
             }
+        }
+
+        stage('Quality Gate') {
+            agent none
+            steps {
+                timeout(time: 5, unit: 'MINUTES') {
+                    waitForQualityGate abortPipeline: true
+                }
+            }
+        }
+
+        stage('Package & Archive') {
+            tools { maven 'Maven-3.9' }
+            steps {
+                sh "mvn package -DskipTests -B -Drevision=${env.APP_VERSION}"
+                sh 'ls -lh target/'
+                archiveArtifacts(
+                    artifacts: 'target/*.war',
+                    fingerprint: true
+                )
+            }
+        }
+
+        stage('Publish Artifact') {
+            steps {
+                nexusArtifactUploader(
+                    nexusVersion: 'nexus3',
+                    protocol: 'http',
+                    nexusUrl: '98.91.250.253:8081',
+                    groupId: 'io.techbuild',
+                    version: env.APP_VERSION,
+                    repository: 'techbuild-releases',
+                    credentialsId: 'nexus-creds',
+                    artifacts: [[
+                        artifactId: env.APP_NAME,
+                        classifier: '',
+                        file: "target/${env.APP_NAME}-${env.APP_VERSION}.war",
+                        type: 'war'
+                    ]]
+                )
+            }
+        }
+    }
+
+    post {
+        success {
+            echo "PIPELINE SUCCESS — ${env.APP_NAME} v${env.APP_VERSION}"
+        }
+
+        failure {
+            echo "PIPELINE FAILED — check logs at ${env.BUILD_URL}"
+        }
+
+        always {
+            cleanWs()
         }
     }
 }
