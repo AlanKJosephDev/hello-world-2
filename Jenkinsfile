@@ -103,7 +103,7 @@ pipeline {
                     artifacts: [[
                         artifactId: env.APP_NAME,
                         classifier: '',
-                        file: "target/${env.APP_NAME}-${env.APP_VERSION}.war",
+                        file: "target/${env.APP_NAME}.war",
                         type: 'war'
                     ]]
                 )
