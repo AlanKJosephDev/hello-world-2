@@ -11,7 +11,7 @@ pipeline {
         MAVEN_OPTS = '-Dmaven.repo.local=/root/.m2/repository'
         MVN_CMD = 'mvn -B -ntp'
         APP_NAME = 'hello-world'
-        APP_VERSION = '1.0-SNAPSHOT'
+        APP_VERSION = '1.0'
     }
 
     options {
